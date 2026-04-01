@@ -36,10 +36,10 @@ public class Main {
             double avg = 0;
             double max = Double.POSITIVE_INFINITY;
             int runs = 1;
-            for (int runCount = 1; runCount <= runs; runCount++) {
+//            for (int runCount = 1; runCount <= runs; runCount++) {
                 Solution bestSolution = null;
                 while (bestSolution == null || bestSolution.getFitness() == Double.POSITIVE_INFINITY) {
-//              int runCount = Integer.parseInt(args[1]);
+              int runCount = Integer.parseInt(args[1]);
                     long randomSeed = System.currentTimeMillis() + runCount;
 
                     Path dataDir = Paths.get("src/main/java/org/example/Data/instance");
@@ -69,21 +69,21 @@ public class Main {
 
                     String problemSize = matcher.matches() ? matcher.group(1) : "unknown";
 
-//                    // Create result directory safely
-//                    String resultDirName = "MultiDepotHHCRSP_"
-//                            + fileName.substring(0, Math.min(20, fileName.length()))
-//                            + "_results";
-//
-//                    Path resultDir = Paths.get("src/main/java/org/example", resultDirName);
-//                    Files.createDirectories(resultDir);
-//
-//                    // Redirect output to result file
-//                    Path outputFile = resultDir.resolve(
-//                            "Result_" + instancePrefix + "_" + runCount + "_" + randomSeed + ".txt"
-//                    );
-//
-//                    try (PrintStream fileOut = new PrintStream(outputFile.toFile())) {
-//                        System.setOut(fileOut);
+                    // Create result directory safely
+                    String resultDirName = "MultiDepotHHCRSP_"
+                            + fileName.substring(0, Math.min(20, fileName.length()))
+                            + "_results";
+
+                    Path resultDir = Paths.get("src/main/java/org/example", resultDirName);
+                    Files.createDirectories(resultDir);
+
+                    // Redirect output to result file
+                    Path outputFile = resultDir.resolve(
+                            "Result_" + instancePrefix + "_" + runCount + "_" + randomSeed + ".txt"
+                    );
+
+                    try (PrintStream fileOut = new PrintStream(outputFile.toFile())) {
+                        System.setOut(fileOut);
 
                     System.out.printf(
                             "Config Parameters: ProblemSize=%s, instanceNumber=%s, seed=%d%n",
@@ -121,10 +121,10 @@ public class Main {
                     System.out.println("Total Distance: " + bestSolution.getTotalTravelCost() + " Total Tardiness: " + bestSolution.getTotalTardiness() + " Highest Tardiness: " + bestSolution.getHighestTardiness() +
                             " Total Waiting Time " + bestSolution.getTotalWaitingTime() + " Total Overtime " + bestSolution.getOvertime() + " Highest Idle Time " + bestSolution.getHighestIdleTime());
                     bestSolution.showSolution(0);
-//                    }
+                    }
                 }
 
-            }
+//            }
             System.out.println("Best: " + max);
             System.out.println("Average Fitness: " + avg / runs);
 
