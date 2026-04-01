@@ -58,7 +58,7 @@ public class Shift {
         this.maxTardiness = new ArrayList<>();
         this.totalWaitingTime = new ArrayList<>();
         this.Overtime = new ArrayList<>();
-        this.currentTime.add(caregiver.getWorking_shift()[0]);
+        this.currentTime.add(0.0);
         this.load = 0.0;
         idleTime = 0.0;
         travelCost.add(0.0);

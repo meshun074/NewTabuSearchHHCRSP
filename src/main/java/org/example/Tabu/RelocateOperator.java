@@ -17,15 +17,12 @@ public class RelocateOperator implements Runnable {
     private static Patient[] allPatients = dataset.getPatients();
     private static final Caregiver[] allCaregivers = dataset.getCaregivers();
     private static int numOfCaregivers = dataset.getCaregivers().length;
-    private final static int numOfDepartingPoints = dataset.getDeparting_points().length;
+    private final static int numOfDepartingPoints = 1;
     private static double[][] distances = dataset.getDistances();
     private final Random rand;
     private final int[] routeEndPoint;
     private final double[] routesCurrentTime;
-    private final double[] highestAndTotalTardiness;
-    private final double[] totalWaitingTime;
-    private final double[] startingWaitingTime;
-    private final double[] totalOvertime;
+    private final double[] highestAndTotalTardiness;;
     private final int selectedPatient;
     private final Set<Integer> track;
 
@@ -37,14 +34,12 @@ public class RelocateOperator implements Runnable {
         this.routeEndPoint = new int[numOfCaregivers];
         this.routesCurrentTime = new double[numOfCaregivers];
         this.highestAndTotalTardiness = new double[2];
-        this.totalWaitingTime = new double[numOfCaregivers + 1];
-        this.startingWaitingTime = new double[numOfCaregivers];
-        this.totalOvertime = new double[numOfCaregivers];
         this.track = new HashSet<>(100);
     }
 
 
     public Solution Start() {
+//        System.out.println("Selected Patient: "+selectedPatient);
         // Initialize variables
         List<Integer>[] p1Routes = p1.getGenes();
         List<Integer>[] c1Routes = new ArrayList[p1Routes.length];
@@ -75,6 +70,7 @@ public class RelocateOperator implements Runnable {
 
         Solution cTemp = new Solution(c1Routes, 0.0, false);
         EvaluationFunction.Evaluate(cTemp);
+
         double bestCost = Double.MAX_VALUE;
         int bestFirst = -1;
         int bestSecond = -1;
@@ -84,7 +80,7 @@ public class RelocateOperator implements Runnable {
         int patient = selectedPatient;
         Shift[] shifts = cTemp.getCaregiversRouteUp();
         boolean isInvalid = cTemp.getFitness() == Double.POSITIVE_INFINITY;
-        Set<CaregiverPair> caregiverPairs = p.getAllPossibleCaregiverCombinationsCrossover();
+        List<CaregiverPair> caregiverPairs = p.getAllPossibleCaregiverCombinations();
         if (p.getRequired_caregivers().length > 1) {
             for (CaregiverPair caregiverPair : caregiverPairs) {
                 int first = caregiverPair.getFirst();
@@ -112,12 +108,30 @@ public class RelocateOperator implements Runnable {
                         }
                         if (noEvaluationConflicts(c1Routes[first], c1Routes[second], m, n)) {
                             double tempCost = calMoveCost(first, m, second, n, patient, cTemp, bestCost, shifts, isInvalid);
+//                            EvaluationFunction.EvaluateFitness(cTemp);
+//                            double subCost = cTemp.getFitness();
                             if (bestCost == Double.MAX_VALUE || bestCost - tempCost > 0.001 && bestCost != Double.POSITIVE_INFINITY && tempCost != Double.POSITIVE_INFINITY || tempCost <= bestCost && rand.nextBoolean()) {
+//                            if (bestCost == Double.MAX_VALUE || bestCost - tempCost > 0.001 && bestCost != Double.POSITIVE_INFINITY && tempCost != Double.POSITIVE_INFINITY ) {
                                 bestCost = tempCost;
                                 bestFirst = first;
                                 bestSecond = second;
                                 bestM = m;
                                 bestN = n;
+//                                if(Math.abs(subCost - bestCost)> 0.001 && subCost != Double.POSITIVE_INFINITY) {
+//                                    System.out.println("Sub Cost :" + subCost);
+//                                    System.out.println(subCost+" != "+Double.POSITIVE_INFINITY);
+//                                    EvaluationFunction.Evaluate(cTemp);
+//                                    System.out.println("3 Swap cost: " + cTemp.getFitness());
+//                                    System.out.println("Travel: "+cTemp.getTotalTravelCost());
+//                                    System.out.println("Tardiness: "+cTemp.getTotalTardiness());
+//                                    System.out.println("Highest Tardiness: "+cTemp.getHighestTardiness());
+//                                    int u =0 ;
+//                                    for (Shift shift : cTemp.getCaregiversRouteUp()) {
+//                                        System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
+//                                        u++;
+//                                    }
+//                                    System.exit(1);
+//                                }
                             }
                         }
                     }
@@ -148,12 +162,41 @@ public class RelocateOperator implements Runnable {
                         continue;
                     }
                     double tempCost = calMoveCost(first, k, -1, -1, patient, cTemp, bestCost, shifts, isInvalid);
-                    if (bestCost == Double.MAX_VALUE || bestCost - tempCost > 0.001 && bestCost != Double.POSITIVE_INFINITY && tempCost != Double.POSITIVE_INFINITY || tempCost <= bestCost && rand.nextBoolean()
-                    ) {
+//                    EvaluationFunction.EvaluateFitness(cTemp);
+//                    double subCost = cTemp.getFitness();
+//                    System.out.println(subCost+" > "+tempCost);
+//                    if(Math.abs(subCost - tempCost)> 0.001) {
+//                        System.out.println("Yzzzz");
+//                        System.out.println("Sub Cost :" + subCost);
+//                        System.out.println("Travel: " + cTemp.getTotalTravelCost());
+//                        System.out.println("Tardiness: " + cTemp.getTotalTardiness());
+//                        System.out.println("Highest Tardiness: " + cTemp.getHighestTardiness());
+//                        System.exit(1);
+//                    }
+                    if (bestCost == Double.MAX_VALUE || bestCost - tempCost > 0.001 && bestCost != Double.POSITIVE_INFINITY && tempCost != Double.POSITIVE_INFINITY || tempCost <= bestCost && rand.nextBoolean()) {
+//                    if (bestCost == Double.MAX_VALUE || bestCost - tempCost > 0.001 && bestCost != Double.POSITIVE_INFINITY && tempCost != Double.POSITIVE_INFINITY ) {
                         bestCost = tempCost;
                         bestFirst = first;
                         bestM = k;
+//                        if(Math.abs(subCost - bestCost)> 0.001 && subCost != Double.POSITIVE_INFINITY) {
+//                            System.out.println(subCost>bestCost);
+//                            System.out.println(subCost+" > "+bestCost);
+//                            System.out.println("Temp Cost :" + bestCost);
+//                            System.out.println("Sub Cost :" + subCost);
+//                            EvaluationFunction.Evaluate(cTemp);
+//                            System.out.println("3 Swap cost: " + cTemp.getFitness());
+//                            System.out.println("Travel: "+cTemp.getTotalTravelCost());
+//                            System.out.println("Tardiness: "+cTemp.getTotalTardiness());
+//                            System.out.println("Highest Tardiness: "+cTemp.getHighestTardiness());
+//                            int u =0 ;
+//                            for (Shift shift : cTemp.getCaregiversRouteUp()) {
+//                                System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
+//                                u++;
+//                            }
+//                            System.exit(1);
+//                        }
                     }
+//                    System.out.println("Route: "+first+" Position: "+k +" Fitness: "+tempCost);
                 }
                 c1Routes[first].remove(Integer.valueOf(patient));
             }
@@ -171,13 +214,17 @@ public class RelocateOperator implements Runnable {
     }
 
     private double calMoveCost(int first, int m, int second, int n, int patient, Solution cTemp, double bestCost, Shift[] shifts, boolean isInvalid) {
-        Arrays.fill(routeEndPoint, -1);
         if (isInvalid) {
             List<Integer>[] c1Routes = cTemp.getGenes();
             Solution temp = new Solution(c1Routes, 0.0, false);
             EvaluationFunction.EvaluateFitness(temp);
+//            System.out.println("1Travel: "+temp.getTotalTravelCost());
+//            System.out.println("Tardiness: "+temp.getTotalTardiness());
+//            System.out.println("Highest Tardiness: "+temp.getHighestTardiness());
+
             return temp.getFitness();
         }
+        Arrays.fill(routeEndPoint, -1);
         int size = 1;
         routeEndPoint[first] = m;
         if (second != -1) {
@@ -197,38 +244,24 @@ public class RelocateOperator implements Runnable {
         removeAffectedPatient(patient, routeMove, positionMove, cTemp, routeEndPoint);
 
         double totalTravelCost = 0.0;
-        double highestIdleTime = 0.0;
         Arrays.fill(highestAndTotalTardiness, 0);
-        Arrays.fill(totalWaitingTime, 0);
-        double overallOvertime = 0.0;
         for (int i = 0; i < routeEndPoint.length; i++) {
             Shift shift = shifts[i];
             List<Double> currentTime = shift.getCurrentTime();
             List<Double> travelCost = shift.getTravelCost();
             List<Double> tardiness = shift.getTardiness();
             List<Double> maxTardiness = shift.getMaxTardiness();
-            List<Double> waitingTime = shift.getTotalWaitingTime();
-            List<Double> overtime = shift.getOvertime();
-
-            if(routeEndPoint[i] == 0){
-                startingWaitingTime[i] = shift.getStartingWaitingTime();
-            }
 
             if (routeEndPoint[i] != -1) {
                 int index = routeEndPoint[i];
                 routesCurrentTime[i] = currentTime.get(index);
                 highestAndTotalTardiness[0] = Math.max(maxTardiness.get(index), highestAndTotalTardiness[0]);
                 highestAndTotalTardiness[1] += tardiness.get(index);
-                totalWaitingTime[i] = waitingTime.get(index);
             } else {
                 highestAndTotalTardiness[0] = Math.max(maxTardiness.get(maxTardiness.size() - 1), highestAndTotalTardiness[0]);
                 highestAndTotalTardiness[1] += tardiness.get(tardiness.size() - 1);
-                totalWaitingTime[i] = waitingTime.get(tardiness.size() - 1);
-                totalOvertime[i] = overtime.get(overtime.size() - 1);
-                overallOvertime += overtime.get(overtime.size() - 1);
-                highestIdleTime = Math.max(shift.getIdleTime(), highestIdleTime);
+
             }
-            totalWaitingTime[numOfCaregivers] += totalWaitingTime[i];
             if (i == first || i == second) {
                 int index = routeEndPoint[i];
                 totalTravelCost += travelCost.get(index);
@@ -243,7 +276,7 @@ public class RelocateOperator implements Runnable {
         for (int i = 0; i < routeEndPoint.length; i++) {
             List<Integer> route = genes[i];
             int routeEnd = routeEndPoint[i];
-            int routeStartPoint = allCaregivers[i].getDistance_matrix_index();
+            int routeStartPoint = 0;
             if (i == first || i == second) {
                 for (int j = routeEnd; j <= route.size(); j++) {
                     if (j == 0) {
@@ -262,8 +295,12 @@ public class RelocateOperator implements Runnable {
             }
         }
 
-        double solutionCost = totalTravelCost + highestAndTotalTardiness[0] + highestAndTotalTardiness[1] + totalWaitingTime[numOfCaregivers] + overallOvertime + highestIdleTime;
+        double solutionCost = (1/3d * totalTravelCost) + (1/3d * highestAndTotalTardiness[0]) + (1/3d * highestAndTotalTardiness[1]);
         if (solutionCost > bestCost) {
+//            System.out.println("2Travel: "+totalTravelCost);
+//            System.out.println("Tardiness: "+highestAndTotalTardiness[1]);
+//            System.out.println("Highest Tardiness: "+highestAndTotalTardiness[0]);
+
             return solutionCost;
         }
 
@@ -273,11 +310,14 @@ public class RelocateOperator implements Runnable {
             List<Integer> route = genes[i];
             int routeEnd = routeEndPoint[i];
             if (routeEnd != -1) {
-                int routeStartingPoint = allCaregivers[i].getDistance_matrix_index();
+                int routeStartingPoint = 0;
                 for (int j = routeEnd; j < route.size(); j++) {
                     int current = j == 0 ? routeStartingPoint : route.get(j - 1) + numOfDepartingPoints;
-                    solutionCost = patientIsAssigned(genes, i, current, route.get(j), totalTravelCost, routesCurrentTime, highestAndTotalTardiness, totalWaitingTime, startingWaitingTime, totalOvertime, routeEndPoint, track);
+                    solutionCost = patientIsAssigned(genes, i, current, route.get(j), totalTravelCost, routesCurrentTime, highestAndTotalTardiness, routeEndPoint, track);
                     if (solutionCost == Double.POSITIVE_INFINITY || solutionCost > bestCost) {
+//                        System.out.println("3Travel: "+totalTravelCost);
+//                        System.out.println("Tardiness: "+highestAndTotalTardiness[1]);
+//                        System.out.println("Highest Tardiness: "+highestAndTotalTardiness[0]);
                         return solutionCost;
                     }
                     track.clear();
@@ -289,20 +329,18 @@ public class RelocateOperator implements Runnable {
             List<Integer> route = genes[i];
             int routeEnd = routeEndPoint[i];
             if (routeEnd != -1) {
-                int routeStartingPoint = allCaregivers[i].getDistance_matrix_index();
+                int routeStartingPoint = 0;
                 int lastPatient = route.get(route.size() - 1) + numOfDepartingPoints;
                 double distance = distances[lastPatient][routeStartingPoint];
                 routesCurrentTime[i] += distance;
-                double caregiverClosingTime = allCaregivers[i].getWorking_shift()[1];
-                overallOvertime += Math.max(0, (routesCurrentTime[i] - caregiverClosingTime));
-                double routeIdleTime = totalWaitingTime[i] + Math.max(0, (caregiverClosingTime - routesCurrentTime[i])) + startingWaitingTime[i];
-                highestIdleTime = Math.max(highestIdleTime, routeIdleTime);
             }
         }
 
-        return totalTravelCost + highestAndTotalTardiness[0] + highestAndTotalTardiness[1] + totalWaitingTime[numOfCaregivers] + highestIdleTime + overallOvertime;
+//        System.out.println("4Travel: "+totalTravelCost);
+//        System.out.println("Tardiness: "+highestAndTotalTardiness[1]);
+//        System.out.println("Highest Tardiness: "+highestAndTotalTardiness[0]);
+        return (1/3d * totalTravelCost) + (1/3d * highestAndTotalTardiness[0]) + (1/3d * highestAndTotalTardiness[1]);
     }
-
 
     private boolean noEvaluationConflicts(List<Integer> c1Route, List<Integer> c2Route, int m, int n) {
         return conflictCheck(c1Route, c2Route, m, n);

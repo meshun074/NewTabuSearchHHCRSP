@@ -109,7 +109,7 @@ public class Tabu {
 //        for (int i = 0; i < patientLength; i++) {
 //            SwapOperator sw = new SwapOperator(this, i, solution, rand);
 //            relocateSolutions.add(sw.Start());
-//            System.exit(1);
+////            System.exit(1);
 //        }
 //
 //        System.exit(1);
@@ -121,13 +121,12 @@ public class Tabu {
             });
         }
 
+
         tempSolutions.clear();
         invokeThreads(es,swapTasks);
         sortSolutions(tempSolutions);
         for (Solution sol : tempSolutions) {
-            if (sol.getFitness() < bestSolution.getFitness()) {
-                return sol;
-            } else if (!tabuList.contains(sol.getMove())) {
+            if (sol.getFitness() < bestSolution.getFitness() || !tabuList.contains(sol.getMove())) {
                 return sol;
             }
         }
@@ -138,10 +137,35 @@ public class Tabu {
         ExecutorService es = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         relocateSolutions.clear();
         List<Callable<Void>> relocateTasks = new ArrayList<>();
+//        for (int i = 0; i < patientLength; i++) {
+//            LocalSearchRelocate sw = new LocalSearchRelocate(this, solution, i, rand);
+//            Solution s1 = sw.localSearch();
+////            System.out.println("Patient: "+i+" "+s1.getFitness());
+////            s1.showSolution(1);
+//            RelocateOperator rw = new RelocateOperator(this,  i, solution, rand);
+//            Solution s2 = rw.Start();
+////            System.out.println("Patient: "+i+" "+s2.getFitness());
+////            s2.showSolution(0);
+//
+//
+//            if(Math.abs(s1.getFitness() - s2.getFitness())>0.001){
+//                System.out.println("hmmmm");
+//                System.out.println("Patient: "+i+" "+s1.getFitness());
+//                s1.showSolution(1);
+//                System.out.println("Patient: "+i+" "+s2.getFitness());
+//                s2.showSolution(0);
+//                System.exit(1);
+//            }
+//
+////            relocateSolutions.add(sw.localSearch());
+//        }
+
+
         for (int i = 0; i < patientLength; i++) {
             int finalI = i;
             relocateTasks.add(()->{
                new RelocateOperator(this, finalI,solution,rand).run();
+//                new LocalSearchRelocate(this,solution,finalI,rand).run();
                return null;
             });
         }
@@ -152,11 +176,7 @@ public class Tabu {
 //        double averageFitness = tempSolutions.stream().mapToDouble(Solution::getFitness).sum() / patientLength;
 //        System.out.println(tabuList);
         for (Solution sol : tempSolutions) {
-            if (sol.getFitness() < bestSolution.getFitness()) {
-//                System.out.println("Best Move: "+sol.getMove()+" Fitness: "+sol.getFitness());
-                return sol;
-            } else if (!tabuList.contains(sol.getMove())) {
-//                System.out.println("Other Move: "+sol.getMove()+" Fitness: "+sol.getFitness());
+            if (sol.getFitness() < bestSolution.getFitness() || !tabuList.contains(sol.getMove())) {
                 return sol;
             }
         }

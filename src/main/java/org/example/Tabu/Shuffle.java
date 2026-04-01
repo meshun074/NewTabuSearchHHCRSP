@@ -17,15 +17,12 @@ public class Shuffle implements Runnable {
     private static Patient[] allPatients = dataset.getPatients();
     private static final Caregiver[] allCaregivers = dataset.getCaregivers();
     private static int numOfCaregivers = dataset.getCaregivers().length;
-    private final static int numOfDepartingPoints = dataset.getDeparting_points().length;
+    private final static int numOfDepartingPoints = 1;
     private static double[][] distances = dataset.getDistances();
     private final Random rand;
     private final int[] routeEndPoint;
     private final double[] routesCurrentTime;
     private final double[] highestAndTotalTardiness;
-    private final double[] totalWaitingTime;
-    private final double[] startingWaitingTime;
-    private final double[] totalOvertime;
     private final Set<Integer> selectRoute;
     private final Set<Integer> track;
 
@@ -37,9 +34,6 @@ public class Shuffle implements Runnable {
         this.routeEndPoint = new int[numOfCaregivers];
         this.routesCurrentTime = new double[numOfCaregivers];
         this.highestAndTotalTardiness = new double[2];
-        this.totalWaitingTime = new double[numOfCaregivers + 1];
-        this.startingWaitingTime = new double[numOfCaregivers];
-        this.totalOvertime = new double[numOfCaregivers];
         this.track = new HashSet<>(100);
     }
 
@@ -184,34 +178,23 @@ public class Shuffle implements Runnable {
         removeAffectedPatient(patient,routeMove, positionMove, cTemp, routeEndPoint);
 
         double totalTravelCost = 0.0;
-        double highestIdleTime = 0.0;
         Arrays.fill(highestAndTotalTardiness, 0);
-        Arrays.fill(totalWaitingTime, 0);
-        double overallOvertime = 0.0;
         for (int i = 0; i < routeEndPoint.length; i++) {
             Shift shift = shifts[i];
             List<Double> currentTime = shift.getCurrentTime();
             List<Double> travelCost = shift.getTravelCost();
             List<Double> tardiness = shift.getTardiness();
             List<Double> maxTardiness = shift.getMaxTardiness();
-            List<Double> waitingTime = shift.getTotalWaitingTime();
-            List<Double> overtime = shift.getOvertime();
 
             if (routeEndPoint[i] != -1) {
                 int index = routeEndPoint[i];
                 routesCurrentTime[i] = currentTime.get(index);
                 highestAndTotalTardiness[0] = Math.max(maxTardiness.get(index), highestAndTotalTardiness[0]);
                 highestAndTotalTardiness[1] += tardiness.get(index);
-                totalWaitingTime[i] = waitingTime.get(index);
             } else {
                 highestAndTotalTardiness[0] = Math.max(maxTardiness.get(maxTardiness.size() - 1), highestAndTotalTardiness[0]);
                 highestAndTotalTardiness[1] += tardiness.get(tardiness.size() - 1);
-                totalWaitingTime[i] = waitingTime.get(tardiness.size() - 1);
-                totalOvertime[i] = overtime.get(overtime.size() - 1);
-                overallOvertime += overtime.get(overtime.size() - 1);
-                highestIdleTime = Math.max(shift.getIdleTime(), highestIdleTime);
             }
-            totalWaitingTime[numOfCaregivers] += totalWaitingTime[i];
             if (i == first || i == second) {
                 int index = routeEndPoint[i];
                 totalTravelCost += travelCost.get(index);
@@ -226,7 +209,7 @@ public class Shuffle implements Runnable {
         for (int i = 0; i < routeEndPoint.length; i++) {
             List<Integer> route = genes[i];
             int routeEnd = routeEndPoint[i];
-            int routeStartPoint = allCaregivers[i].getDistance_matrix_index();
+            int routeStartPoint = 0;
             if (i == first || i == second) {
                 for (int j = routeEnd; j <= route.size(); j++) {
                     if (j == 0) {
@@ -245,7 +228,7 @@ public class Shuffle implements Runnable {
             }
         }
 
-        double solutionCost = totalTravelCost + highestAndTotalTardiness[0] + highestAndTotalTardiness[1] + totalWaitingTime[numOfCaregivers] + overallOvertime + highestIdleTime;
+        double solutionCost = 1/3.0 * totalTravelCost + 1/3.0 * highestAndTotalTardiness[0] + 1/3.0 * highestAndTotalTardiness[1];
         if (solutionCost > bestCost) {
             return solutionCost;
         }
@@ -256,10 +239,10 @@ public class Shuffle implements Runnable {
             List<Integer> route = genes[i];
             int routeEnd = routeEndPoint[i];
             if (routeEnd != -1) {
-                int routeStartingPoint = allCaregivers[i].getDistance_matrix_index();
+                int routeStartingPoint = 0;
                 for (int j = routeEnd; j < route.size(); j++) {
                     int current = j == 0 ? routeStartingPoint : route.get(j - 1)+numOfDepartingPoints;
-                    solutionCost = patientIsAssigned(genes, i, current, route.get(j), totalTravelCost, routesCurrentTime, highestAndTotalTardiness, totalWaitingTime, startingWaitingTime, totalOvertime,routeEndPoint, track);
+                    solutionCost = patientIsAssigned(genes, i, current, route.get(j), totalTravelCost, routesCurrentTime, highestAndTotalTardiness, routeEndPoint, track);
                     if (solutionCost == Double.POSITIVE_INFINITY || solutionCost > bestCost) {
                         return solutionCost;
                     }
@@ -272,18 +255,14 @@ public class Shuffle implements Runnable {
             List<Integer> route = genes[i];
             int routeEnd = routeEndPoint[i];
             if (routeEnd != -1) {
-                int routeStartingPoint = allCaregivers[i].getDistance_matrix_index();
+                int routeStartingPoint = 0;
                 int lastPatient = route.get(route.size()-1) + numOfDepartingPoints;
                 double distance = distances[lastPatient][routeStartingPoint];
                 routesCurrentTime[i] += distance;
-                double caregiverClosingTime = allCaregivers[i].getWorking_shift()[1];
-                overallOvertime += Math.max(0, (routesCurrentTime[i] - caregiverClosingTime));
-                double routeIdleTime = totalWaitingTime[i] + Math.max(0, (caregiverClosingTime - routesCurrentTime[i]));
-                highestIdleTime = Math.max(highestIdleTime, routeIdleTime);
             }
         }
 
-        return totalTravelCost + highestAndTotalTardiness[0] + highestAndTotalTardiness[1] + totalWaitingTime[numOfCaregivers] + highestIdleTime + overallOvertime;
+        return 1/3.0 * totalTravelCost + 1/3.0 * highestAndTotalTardiness[0] + 1/3.0 * highestAndTotalTardiness[1];
     }
 
 

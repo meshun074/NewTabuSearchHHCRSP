@@ -196,7 +196,7 @@ public class Solution {
         InstancesClass instance = Main.instance;
         for(int i =0; i<caregivers;i++){
             Caregiver caregiver = instance.getCaregivers()[i];
-            Shift s = new Shift(caregiver,new ArrayList<>(), caregiver.getWorking_shift()[0]);
+            Shift s = new Shift(caregiver,new ArrayList<>(), 0.0);
             caregiversRouteUp[i] = s;
         }
     }

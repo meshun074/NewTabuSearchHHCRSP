@@ -17,15 +17,12 @@ public class SwapOperator implements Runnable {
     private static Patient[] allPatients = dataset.getPatients();
     private static final Caregiver[] allCaregivers = dataset.getCaregivers();
     private static int numOfCaregivers = dataset.getCaregivers().length;
-    private final static int numOfDepartingPoints = dataset.getDeparting_points().length;
+    private final static int numOfDepartingPoints = 1;
     private static double[][] distances = dataset.getDistances();
     private final Random rand;
     private final int[] routeEndPoint;
     private final double[] routesCurrentTime;
     private final double[] highestAndTotalTardiness;
-    private final double[] totalWaitingTime;
-    private final double[] startingWaitingTime;
-    private final double[] totalOvertime;
     private final int selectedPatient;
     private final Set<Integer> track;
 
@@ -37,9 +34,6 @@ public class SwapOperator implements Runnable {
         this.routeEndPoint = new int[numOfCaregivers];
         this.routesCurrentTime = new double[numOfCaregivers];
         this.highestAndTotalTardiness = new double[2];
-        this.totalWaitingTime = new double[numOfCaregivers + 1];
-        this.startingWaitingTime = new double[numOfCaregivers];
-        this.totalOvertime = new double[numOfCaregivers];
         this.track = new HashSet<>(100);
     }
 
@@ -53,12 +47,13 @@ public class SwapOperator implements Runnable {
             List<Integer> route = new ArrayList<>(p1Routes[i]);
             c1Routes[i] = route;
         }
+//        System.out.println("Original "+p1);
 
         Solution cTemp = new Solution(c1Routes, 0.0, false);
         EvaluationFunction.Evaluate(cTemp);
         boolean isInvalid;
         double bestFitness = cTemp.getFitness();
-//        System.out.println("Patient: "+selectedPatient);
+//        System.out.println("Selected Patient: "+selectedPatient);
 //        System.out.println(cTemp);
 
         isInvalid = bestFitness == Double.POSITIVE_INFINITY;
@@ -110,8 +105,8 @@ public class SwapOperator implements Runnable {
                             double tempCost = calSwapMoveCost(1, c1, firstPosition, -1, -1, -1, -1, -1, -1, patient, otherPatient1, j, -1, -1, cTemp, bestCost, shifts, isInvalid);
 //                            System.out.println("best cost: " + bestCost);
 //                            System.out.println("1 Swap cost: " + tempCost);
-                            EvaluationFunction.EvaluateFitness(cTemp);
-                            double subCost = cTemp.getFitness();
+//                            EvaluationFunction.EvaluateFitness(cTemp);
+//                            double subCost = cTemp.getFitness();
 //                            System.out.println("2 Swap cost: " + subCost);
 //                            System.out.println("Total Distance: "+ cTemp.getTotalTravelCost() + " Total tardiness: "+ cTemp.getTotalTardiness() +
 //                                    " Highest Tardiness: "+ cTemp.getHighestTardiness()+ " Total Waiting: "+ cTemp.getTotalWaitingTime()+
@@ -127,16 +122,21 @@ public class SwapOperator implements Runnable {
                                 bestPatient1 = otherPatient1;
                                 bestPatient2 = -1;
                                 pos = 1;
-                                if(subCost > bestCost) {
-                                    EvaluationFunction.Evaluate(cTemp);
-                                    System.out.println("3 Swap cost: " + cTemp.getFitness());
-                                    int u =0 ;
-                                    for (Shift shift : cTemp.getCaregiversRouteUp()) {
-                                        System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
-                                        u++;
-                                    }
-                                    System.exit(1);
-                                }
+//                                if(Math.abs(subCost - bestCost ) > 0.001&& subCost != Double.POSITIVE_INFINITY) {
+//                                    System.out.println("Sub Cost s1:" + subCost);
+//                                    System.out.println("best Cost s1:" + bestCost);
+//                                    EvaluationFunction.Evaluate(cTemp);
+//                                    System.out.println("3 Swap cost: " + cTemp.getFitness());
+//                                    System.out.println("Travel: "+cTemp.getTotalTravelCost());
+//                                    System.out.println("Tardiness: "+cTemp.getTotalTardiness());
+//                                    System.out.println("Highest Tardiness: "+cTemp.getHighestTardiness());
+//                                    int u =0 ;
+//                                    for (Shift shift : cTemp.getCaregiversRouteUp()) {
+//                                        System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
+//                                        u++;
+//                                    }
+//                                    System.exit(1);
+//                                }
                             }
 
                         }
@@ -159,8 +159,8 @@ public class SwapOperator implements Runnable {
                                         double tempCost = calSwapMoveCost(2, c1, firstPosition, -1, -1, c2, secondPosition, -1, -1, patient, otherPatient1, j, otherPatient2, k, cTemp, bestCost, shifts, isInvalid);
 //                                        System.out.println("best cost: " + bestCost);
 //                                        System.out.println("1 Swap cost: " + tempCost);
-                                        EvaluationFunction.EvaluateFitness(cTemp);
-                                        double subCost = cTemp.getFitness();
+//                                        EvaluationFunction.EvaluateFitness(cTemp);
+//                                        double subCost = cTemp.getFitness();
 //                                        System.out.println("2 Swap cost: " + subCost);
 //                                        System.out.println("Total Distance: "+ cTemp.getTotalTravelCost() + " Total tardiness: "+ cTemp.getTotalTardiness() +
 //                                                " Highest Tardiness: "+ cTemp.getHighestTardiness()+ " Total Waiting: "+ cTemp.getTotalWaitingTime()+
@@ -176,16 +176,21 @@ public class SwapOperator implements Runnable {
                                             bestPatient1 = otherPatient1;
                                             bestPatient2 = otherPatient2;
                                             pos = 2;
-                                            if(subCost > bestCost) {
-                                                EvaluationFunction.Evaluate(cTemp);
-                                                System.out.println("3 Swap cost: " + cTemp.getFitness());
-                                                int u =0 ;
-                                                for (Shift shift : cTemp.getCaregiversRouteUp()) {
-                                                    System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
-                                                    u++;
-                                                }
-                                                System.exit(1);
-                                            }
+//                                            if(Math.abs(subCost - bestCost ) > 0.001&& subCost != Double.POSITIVE_INFINITY) {
+//                                                System.out.println("Sub Cost s2 :" + subCost);
+//                                                System.out.println("best Cost s2:" + bestCost);
+//                                                EvaluationFunction.Evaluate(cTemp);
+//                                                System.out.println("3 Swap cost: " + cTemp.getFitness());
+//                                                System.out.println("Travel: "+cTemp.getTotalTravelCost());
+//                                                System.out.println("Tardiness: "+cTemp.getTotalTardiness());
+//                                                System.out.println("Highest Tardiness: "+cTemp.getHighestTardiness());
+//                                                int u =0 ;
+//                                                for (Shift shift : cTemp.getCaregiversRouteUp()) {
+//                                                    System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
+//                                                    u++;
+//                                                }
+//                                                System.exit(1);
+//                                            }
                                         }
                                     } else {
 //                                        temp1.setFirst(c2);
@@ -194,8 +199,8 @@ public class SwapOperator implements Runnable {
                                         double tempCost = calSwapMoveCost(3,-1, -1, -1, -1, c2, secondPosition,-1, -1, patient, -1, -1, otherPatient2, k, cTemp, bestCost, shifts, isInvalid);
 //                                        System.out.println("best cost: " + bestCost);
 //                                        System.out.println("1 Swap cost: " + tempCost);
-                                        EvaluationFunction.EvaluateFitness(cTemp);
-                                        double subCost = cTemp.getFitness();
+//                                        EvaluationFunction.EvaluateFitness(cTemp);
+//                                        double subCost = cTemp.getFitness();
 //                                        System.out.println("2 Swap cost: " + subCost);
 //                                        System.out.println("Total Distance: "+ cTemp.getTotalTravelCost() + " Total tardiness: "+ cTemp.getTotalTardiness() +
 //                                                " Highest Tardiness: "+ cTemp.getHighestTardiness()+ " Total Waiting: "+ cTemp.getTotalWaitingTime()+
@@ -211,16 +216,21 @@ public class SwapOperator implements Runnable {
                                             bestPatient1 = -1;
                                             bestPatient2 = otherPatient2;
                                             pos = 3;
-                                            if(subCost > bestCost) {
-                                                EvaluationFunction.Evaluate(cTemp);
-                                                System.out.println("3 Swap cost: " + cTemp.getFitness());
-                                                int u =0 ;
-                                                for (Shift shift : cTemp.getCaregiversRouteUp()) {
-                                                    System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
-                                                    u++;
-                                                }
-                                                System.exit(1);
-                                            }
+//                                            if(Math.abs(subCost - bestCost ) > 0.001&& subCost != Double.POSITIVE_INFINITY) {
+//                                                System.out.println("Sub Cost s3:" + subCost);
+//                                                System.out.println("best Cost s3:" + bestCost);
+//                                                EvaluationFunction.Evaluate(cTemp);
+//                                                System.out.println("3 Swap cost: " + cTemp.getFitness());
+//                                                System.out.println("Travel: "+cTemp.getTotalTravelCost());
+//                                                System.out.println("Tardiness: "+cTemp.getTotalTardiness());
+//                                                System.out.println("Highest Tardiness: "+cTemp.getHighestTardiness());
+//                                                int u =0 ;
+//                                                for (Shift shift : cTemp.getCaregiversRouteUp()) {
+//                                                    System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
+//                                                    u++;
+//                                                }
+//                                                System.exit(1);
+//                                            }
                                         }
                                     }
                                 }
@@ -230,7 +240,7 @@ public class SwapOperator implements Runnable {
                             for (int k = 0; k < c1Routes[c2].size(); k++) {
                                 int otherPatient2 = c1Routes[c2].get(k);
                                 Patient patient2 = allPatients[otherPatient2];
-                                if (swapIsPossible(cTemp, otherPatient2, patient2, patientRouteIndex2, c2)) {
+                                if (swapIsPossible(cTemp, patientRouteIndex1, otherPatient2, patient2, patientRouteIndex2, c2)) {
                                     c1Routes[c2].set(k, patient);
                                     c1Routes[patientRouteIndex2].set(p2Index, otherPatient2);
                                     //Todo
@@ -246,8 +256,8 @@ public class SwapOperator implements Runnable {
                                         double tempCost = calSwapMoveCost(4, c1, firstPosition, -1, -1, c2, k, patientRouteIndex2, p2Index, patient, otherPatient1, j, otherPatient2, k, cTemp, bestCost, shifts, isInvalid);
 //                                        System.out.println("best cost: " + bestCost);
 //                                        System.out.println("1 Swap cost: " + tempCost);
-                                        EvaluationFunction.EvaluateFitness(cTemp);
-                                        double subCost = cTemp.getFitness();
+//                                        EvaluationFunction.EvaluateFitness(cTemp);
+//                                        double subCost = cTemp.getFitness();
 //                                        System.out.println("2 Swap cost: " + subCost);
 //                                        System.out.println("Total Distance: "+ cTemp.getTotalTravelCost() + " Total tardiness: "+ cTemp.getTotalTardiness() +
 //                                                " Highest Tardiness: "+ cTemp.getHighestTardiness()+ " Total Waiting: "+ cTemp.getTotalWaitingTime()+
@@ -263,16 +273,21 @@ public class SwapOperator implements Runnable {
                                             bestPatient1 = otherPatient1;
                                             bestPatient2 = otherPatient2;
                                             pos = 4;
-                                            if(subCost > bestCost) {
-                                                EvaluationFunction.Evaluate(cTemp);
-                                                System.out.println("3 Swap cost: " + cTemp.getFitness());
-                                                int u =0 ;
-                                                for (Shift shift : cTemp.getCaregiversRouteUp()) {
-                                                    System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
-                                                    u++;
-                                                }
-                                                System.exit(1);
-                                            }
+//                                            if(Math.abs(subCost - bestCost ) > 0.001&& subCost != Double.POSITIVE_INFINITY) {
+//                                                System.out.println("Sub Cost s4:" + subCost);
+//                                                System.out.println("best Cost s4:" + bestCost);
+//                                                EvaluationFunction.Evaluate(cTemp);
+//                                                System.out.println("3 Swap cost: " + cTemp.getFitness());
+//                                                System.out.println("Travel: "+cTemp.getTotalTravelCost());
+//                                                System.out.println("Tardiness: "+cTemp.getTotalTardiness());
+//                                                System.out.println("Highest Tardiness: "+cTemp.getHighestTardiness());
+//                                                int u =0 ;
+//                                                for (Shift shift : cTemp.getCaregiversRouteUp()) {
+//                                                    System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
+//                                                    u++;
+//                                                }
+//                                                System.exit(1);
+//                                            }
                                         }
                                     } else {
 //                                        temp.setFirst(c2);
@@ -284,8 +299,8 @@ public class SwapOperator implements Runnable {
                                         double tempCost = calSwapMoveCost(5,-1, -1, -1, -1, c2, k, patientRouteIndex2, p2Index, patient, -1, -1, otherPatient2, k, cTemp, bestCost, shifts, isInvalid);
 //                                        System.out.println("best cost: " + bestCost);
 //                                        System.out.println("1 Swap cost: " + tempCost);
-                                        EvaluationFunction.EvaluateFitness(cTemp);
-                                        double subCost = cTemp.getFitness();
+//                                        EvaluationFunction.EvaluateFitness(cTemp);
+//                                        double subCost = cTemp.getFitness();
 //                                        System.out.println("2 Swap cost: " + subCost);
 //                                        System.out.println("Total Distance: "+ cTemp.getTotalTravelCost() + " Total tardiness: "+ cTemp.getTotalTardiness() +
 //                                                " Highest Tardiness: "+ cTemp.getHighestTardiness()+ " Total Waiting: "+ cTemp.getTotalWaitingTime()+
@@ -301,16 +316,21 @@ public class SwapOperator implements Runnable {
                                             bestPatient1 = -1;
                                             bestPatient2 = otherPatient2;
                                             pos = 5;
-                                            if(subCost > bestCost) {
-                                                EvaluationFunction.Evaluate(cTemp);
-                                                System.out.println("3 Swap cost: " + cTemp.getFitness());
-                                                int u =0 ;
-                                                for (Shift shift : cTemp.getCaregiversRouteUp()) {
-                                                    System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
-                                                    u++;
-                                                }
-                                                System.exit(1);
-                                            }
+//                                            if(Math.abs(subCost - bestCost ) > 0.001&& subCost != Double.POSITIVE_INFINITY) {
+//                                                System.out.println("Sub Cost s5:" + subCost);
+//                                                System.out.println("best Cost s5:" + bestCost);
+//                                                EvaluationFunction.Evaluate(cTemp);
+//                                                System.out.println("3 Swap cost: " + cTemp.getFitness());
+//                                                System.out.println("Travel: "+cTemp.getTotalTravelCost());
+//                                                System.out.println("Tardiness: "+cTemp.getTotalTardiness());
+//                                                System.out.println("Highest Tardiness: "+cTemp.getHighestTardiness());
+//                                                int u =0 ;
+//                                                for (Shift shift : cTemp.getCaregiversRouteUp()) {
+//                                                    System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
+//                                                    u++;
+//                                                }
+//                                                System.exit(1);
+//                                            }
                                         }
                                     }
 
@@ -325,7 +345,7 @@ public class SwapOperator implements Runnable {
                     for (int j = 0; j < c1Routes[c1].size(); j++) {
                         int otherPatient1 = c1Routes[c1].get(j);
                         Patient patient1 = allPatients[otherPatient1];
-                        boolean firstSwap = swapIsPossible(cTemp, otherPatient1, patient1, patientRouteIndex1, c1);
+                        boolean firstSwap = swapIsPossible(cTemp, patientRouteIndex2, otherPatient1, patient1, patientRouteIndex1, c1);
                         if (firstSwap) {
                             c1Routes[c1].set(j, patient);
                             c1Routes[patientRouteIndex1].set(p1Index, otherPatient1);
@@ -339,11 +359,11 @@ public class SwapOperator implements Runnable {
 //                            System.out.println(cTemp);
 //                            System.out.println("Patient 1: "+otherPatient1);
                             double tempCost = calSwapMoveCost(6, c1, j, patientRouteIndex1, p1Index, -1, -1, -1, -1, patient, otherPatient1, j, -1, -1, cTemp, bestCost, shifts, isInvalid);
-//                            System.out.println("rtbest cost: " + bestCost);
+//                            System.out.println("rtbest cost: " + tempCost+ " "+cTemp);
 //                            System.out.println("1 Swap cost: " + tempCost);
-                            EvaluationFunction.EvaluateFitness(cTemp);
-                            double subCost = cTemp.getFitness();
-//                            System.out.println("2 Swap cost: " + subCost);
+//                            EvaluationFunction.EvaluateFitness(cTemp);
+//                            double subCost = cTemp.getFitness();
+//                            System.out.println("2 Swap cost: " + subCost+ " "+cTemp);
 //                            System.out.println("Total Distance: "+ cTemp.getTotalTravelCost() + " Total tardiness: "+ cTemp.getTotalTardiness() +
 //                                    " Highest Tardiness: "+ cTemp.getHighestTardiness()+ " Total Waiting: "+ cTemp.getTotalWaitingTime()+
 //                                    " Total overtime: "+ cTemp.getOvertime()+ " Highest Idle time: "+ cTemp.getHighestIdleTime());
@@ -366,16 +386,21 @@ public class SwapOperator implements Runnable {
                                 bestPatient1 = otherPatient1;
                                 bestPatient2 = -1;
                                 pos = 6;
-                                if(subCost > bestCost) {
-                                    EvaluationFunction.Evaluate(cTemp);
-                                    System.out.println("3 Swap cost: " + cTemp.getFitness());
-                                    int u =0 ;
-                                    for (Shift shift : cTemp.getCaregiversRouteUp()) {
-                                        System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
-                                        u++;
-                                    }
-                                    System.exit(1);
-                                }
+//                                if(Math.abs(subCost - bestCost ) > 0.001&& subCost != Double.POSITIVE_INFINITY) {
+//                                    System.out.println("Sub Cost s6:" + subCost);
+//                                    System.out.println("best Cost s6:" + bestCost);
+//                                    EvaluationFunction.Evaluate(cTemp);
+//                                    System.out.println("3 Swap cost: " + cTemp.getFitness());
+//                                    System.out.println("Travel: "+cTemp.getTotalTravelCost());
+//                                    System.out.println("Tardiness: "+cTemp.getTotalTardiness());
+//                                    System.out.println("Highest Tardiness: "+cTemp.getHighestTardiness());
+//                                    int u =0 ;
+//                                    for (Shift shift : cTemp.getCaregiversRouteUp()) {
+//                                        System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
+//                                        u++;
+//                                    }
+//                                    System.exit(1);
+//                                }
                             }
                         }
 
@@ -400,8 +425,8 @@ public class SwapOperator implements Runnable {
                                         double tempCost = calSwapMoveCost(7, c1, j, patientRouteIndex1, p1Index, c2, secondPosition, -1, -1, patient, otherPatient1, j, otherPatient2, k, cTemp, bestCost, shifts, isInvalid);
 //                                        System.out.println("best cost: " + bestCost);
 //                                        System.out.println("1 Swap cost: " + tempCost);
-                                        EvaluationFunction.EvaluateFitness(cTemp);
-                                        double subCost = cTemp.getFitness();
+//                                        EvaluationFunction.EvaluateFitness(cTemp);
+//                                        double subCost = cTemp.getFitness();
 //                                        System.out.println("2 Swap cost: " + subCost);
 //                                        System.out.println("Total Distance: "+ cTemp.getTotalTravelCost() + " Total tardiness: "+ cTemp.getTotalTardiness() +
 //                                                " Highest Tardiness: "+ cTemp.getHighestTardiness()+ " Total Waiting: "+ cTemp.getTotalWaitingTime()+
@@ -417,16 +442,21 @@ public class SwapOperator implements Runnable {
                                             bestPatient1 = otherPatient1;
                                             bestPatient2 = otherPatient2;
                                             pos = 7;
-                                            if(subCost > bestCost) {
-                                                EvaluationFunction.Evaluate(cTemp);
-                                                System.out.println("3 Swap cost: " + cTemp.getFitness());
-                                                int u =0 ;
-                                                for (Shift shift : cTemp.getCaregiversRouteUp()) {
-                                                    System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
-                                                    u++;
-                                                }
-                                                System.exit(1);
-                                            }
+//                                            if(Math.abs(subCost - bestCost ) > 0.001&& subCost != Double.POSITIVE_INFINITY) {
+//                                                System.out.println("Sub Cost s7:" + subCost);
+//                                                System.out.println("best Cost s7:" + bestCost);
+//                                                EvaluationFunction.Evaluate(cTemp);
+//                                                System.out.println("3 Swap cost: " + cTemp.getFitness());
+//                                                System.out.println("Travel: "+cTemp.getTotalTravelCost());
+//                                                System.out.println("Tardiness: "+cTemp.getTotalTardiness());
+//                                                System.out.println("Highest Tardiness: "+cTemp.getHighestTardiness());
+//                                                int u =0 ;
+//                                                for (Shift shift : cTemp.getCaregiversRouteUp()) {
+//                                                    System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
+//                                                    u++;
+//                                                }
+//                                                System.exit(1);
+//                                            }
                                         }
                                     } else {
 //                                        temp1.setFirst(c2);
@@ -435,8 +465,8 @@ public class SwapOperator implements Runnable {
                                         double tempCost = calSwapMoveCost(3,-1, -1, -1, -1, c2, secondPosition, -1, -1, patient, -1, -1, otherPatient2, k, cTemp, bestCost, shifts, isInvalid);
 //                                        System.out.println("best cost: " + bestCost);
 //                                        System.out.println("1 Swap cost: " + tempCost);
-                                        EvaluationFunction.EvaluateFitness(cTemp);
-                                        double subCost = cTemp.getFitness();
+//                                        EvaluationFunction.EvaluateFitness(cTemp);
+//                                        double subCost = cTemp.getFitness();
 //                                        System.out.println("2 Swap cost: " + subCost);
 //                                        System.out.println("Total Distance: "+ cTemp.getTotalTravelCost() + " Total tardiness: "+ cTemp.getTotalTardiness() +
 //                                                " Highest Tardiness: "+ cTemp.getHighestTardiness()+ " Total Waiting: "+ cTemp.getTotalWaitingTime()+
@@ -452,16 +482,21 @@ public class SwapOperator implements Runnable {
                                             bestPatient1 = -1;
                                             bestPatient2 = otherPatient2;
                                             pos = 3;
-                                            if(subCost > bestCost) {
-                                                EvaluationFunction.Evaluate(cTemp);
-                                                System.out.println("3 Swap cost: " + cTemp.getFitness());
-                                                int u =0 ;
-                                                for (Shift shift : cTemp.getCaregiversRouteUp()) {
-                                                    System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
-                                                    u++;
-                                                }
-                                                System.exit(1);
-                                            }
+//                                            if(Math.abs(subCost - bestCost ) > 0.001&& subCost != Double.POSITIVE_INFINITY) {
+//                                                System.out.println("Sub Cost s8:" + subCost);
+//                                                System.out.println("best Cost s8:" + bestCost);
+//                                                EvaluationFunction.Evaluate(cTemp);
+//                                                System.out.println("3 Swap cost: " + cTemp.getFitness());
+//                                                System.out.println("Travel: "+cTemp.getTotalTravelCost());
+//                                                System.out.println("Tardiness: "+cTemp.getTotalTardiness());
+//                                                System.out.println("Highest Tardiness: "+cTemp.getHighestTardiness());
+//                                                int u =0 ;
+//                                                for (Shift shift : cTemp.getCaregiversRouteUp()) {
+//                                                    System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
+//                                                    u++;
+//                                                }
+//                                                System.exit(1);
+//                                            }
                                         }
                                     }
                                 }
@@ -473,6 +508,7 @@ public class SwapOperator implements Runnable {
                                 Patient patient2 = allPatients[otherPatient2];
                                 boolean secondSwap = doubleSwapIsPossible(cTemp, otherPatient1, patientRouteIndex1, c1, firstSwap, otherPatient2, patient2, patientRouteIndex2, c2);
                                 if (secondSwap) {
+//                                    System.out.println("before secondSwap isPossible"+cTemp);
                                     c1Routes[c2].set(k, patient);
                                     c1Routes[patientRouteIndex2].set(p2Index, otherPatient2);
                                     //Todo
@@ -490,8 +526,8 @@ public class SwapOperator implements Runnable {
                                         double tempCost = calSwapMoveCost(8, c1, j, patientRouteIndex1, p1Index, c2, k, patientRouteIndex2, p2Index, patient, otherPatient1, j, otherPatient2, k, cTemp, bestCost, shifts, isInvalid);
 //                                        System.out.println("best cost: " + bestCost);
 //                                        System.out.println("1 Swap cost: " + tempCost);
-                                        EvaluationFunction.EvaluateFitness(cTemp);
-                                        double subCost = cTemp.getFitness();
+//                                        EvaluationFunction.EvaluateFitness(cTemp);
+//                                        double subCost = cTemp.getFitness();
 //                                        System.out.println("2 Swap cost: " + subCost);
 //                                        System.out.println("Total Distance: "+ cTemp.getTotalTravelCost() + " Total tardiness: "+ cTemp.getTotalTardiness() +
 //                                                " Highest Tardiness: "+ cTemp.getHighestTardiness()+ " Total Waiting: "+ cTemp.getTotalWaitingTime()+
@@ -507,16 +543,25 @@ public class SwapOperator implements Runnable {
                                             bestPatient1 = otherPatient1;
                                             bestPatient2 = otherPatient2;
                                             pos = 8;
-                                            if(subCost > bestCost) {
-                                                EvaluationFunction.Evaluate(cTemp);
-                                                System.out.println("3 Swap cost: " + cTemp.getFitness());
-                                                int u =0 ;
-                                                for (Shift shift : cTemp.getCaregiversRouteUp()) {
-                                                    System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
-                                                    u++;
-                                                }
-                                                System.exit(1);
-                                            }
+//                                            if(Math.abs(subCost - bestCost ) > 0.001&& subCost != Double.POSITIVE_INFINITY) {
+////                                                for(List<Integer> L : c1Routes){
+////                                                    System.out.println("route: "+L);
+////                                                }
+//                                                System.out.println(cTemp);
+//                                                System.out.println("Sub Cost s9:" + subCost);
+//                                                System.out.println("best Cost s9:" + bestCost);
+//                                                EvaluationFunction.Evaluate(cTemp);
+//                                                System.out.println("3 Swap cost: " + cTemp.getFitness());
+//                                                System.out.println("Travel: "+cTemp.getTotalTravelCost());
+//                                                System.out.println("Tardiness: "+cTemp.getTotalTardiness());
+//                                                System.out.println("Highest Tardiness: "+cTemp.getHighestTardiness());
+//                                                int u =0 ;
+//                                                for (Shift shift : cTemp.getCaregiversRouteUp()) {
+//                                                    System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
+//                                                    u++;
+//                                                }
+//                                                System.exit(1);
+//                                            }
                                         }
                                     } else {
 //                                        temp1.setFirst(c2);
@@ -527,8 +572,8 @@ public class SwapOperator implements Runnable {
                                         double tempCost = calSwapMoveCost(5, -1, -1, -1, -1, c2, k, patientRouteIndex2, p2Index, patient, -1, -1, otherPatient2, k, cTemp, bestCost, shifts, isInvalid);
 //                                        System.out.println("best cost: " + bestCost);
 //                                        System.out.println("1 Swap cost: " + tempCost);
-                                        EvaluationFunction.EvaluateFitness(cTemp);
-                                        double subCost = cTemp.getFitness();
+//                                        EvaluationFunction.EvaluateFitness(cTemp);
+//                                        double subCost = cTemp.getFitness();
 //                                        System.out.println("2 Swap cost: " + subCost);
 //                                        System.out.println("Total Distance: "+ cTemp.getTotalTravelCost() + " Total tardiness: "+ cTemp.getTotalTardiness() +
 //                                                " Highest Tardiness: "+ cTemp.getHighestTardiness()+ " Total Waiting: "+ cTemp.getTotalWaitingTime()+
@@ -544,16 +589,21 @@ public class SwapOperator implements Runnable {
                                             bestPatient1 = -1;
                                             bestPatient2 = otherPatient2;
                                             pos = 5;
-                                            if(subCost > bestCost) {
-                                                EvaluationFunction.Evaluate(cTemp);
-                                                System.out.println("3 Swap cost: " + cTemp.getFitness());
-                                                int u =0 ;
-                                                for (Shift shift : cTemp.getCaregiversRouteUp()) {
-                                                    System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
-                                                    u++;
-                                                }
-                                                System.exit(1);
-                                            }
+//                                            if(Math.abs(subCost - bestCost ) > 0.001&& subCost != Double.POSITIVE_INFINITY) {
+//                                                System.out.println("Sub Cost s10:" + subCost);
+//                                                System.out.println("best Cost s10:" + bestCost);
+//                                                EvaluationFunction.Evaluate(cTemp);
+//                                                System.out.println("3 Swap cost: " + cTemp.getFitness());
+//                                                System.out.println("Travel: "+cTemp.getTotalTravelCost());
+//                                                System.out.println("Tardiness: "+cTemp.getTotalTardiness());
+//                                                System.out.println("Highest Tardiness: "+cTemp.getHighestTardiness());
+//                                                int u =0 ;
+//                                                for (Shift shift : cTemp.getCaregiversRouteUp()) {
+//                                                    System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
+//                                                    u++;
+//                                                }
+//                                                System.exit(1);
+//                                            }
                                         }
                                     }
 
@@ -644,8 +694,8 @@ public class SwapOperator implements Runnable {
                             double tempCost = calSwapMoveCost(1, c1, firstPosition, -1, -1, -1, -1, -1, -1, patient, otherPatient, k, -1, -1, cTemp, bestCost, shifts, isInvalid);
 //                            System.out.println("best cost: " + bestCost);
 //                            System.out.println("1 Swap cost: " + tempCost);
-                            EvaluationFunction.EvaluateFitness(cTemp);
-                            double subCost = cTemp.getFitness();
+//                            EvaluationFunction.EvaluateFitness(cTemp);
+//                            double subCost = cTemp.getFitness();
 //                            System.out.println("2 Swap cost: " + subCost);
 //                            System.out.println("Total Distance: "+ cTemp.getTotalTravelCost() + " Total tardiness: "+ cTemp.getTotalTardiness() +
 //                                    " Highest Tardiness: "+ cTemp.getHighestTardiness()+ " Total Waiting: "+ cTemp.getTotalWaitingTime()+
@@ -657,16 +707,21 @@ public class SwapOperator implements Runnable {
                                 bestFirstPosition = k;
                                 bestSecondPosition = pIndex;
                                 bestPatient1 = otherPatient;
-                                if(subCost > bestCost) {
-                                    EvaluationFunction.Evaluate(cTemp);
-                                    System.out.println("3 Swap cost: " + cTemp.getFitness());
-                                    int u =0 ;
-                                    for (Shift shift : cTemp.getCaregiversRouteUp()) {
-                                        System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
-                                        u++;
-                                    }
-                                    System.exit(1);
-                                }
+//                                if(Math.abs(subCost - bestCost ) > 0.001&& subCost != Double.POSITIVE_INFINITY) {
+//                                    System.out.println("Sub Cost s11:" + subCost);
+//                                    System.out.println("best Cost s11:" + bestCost);
+//                                    EvaluationFunction.Evaluate(cTemp);
+//                                    System.out.println("3 Swap cost: " + cTemp.getFitness());
+//                                    System.out.println("Travel: "+cTemp.getTotalTravelCost());
+//                                    System.out.println("Tardiness: "+cTemp.getTotalTardiness());
+//                                    System.out.println("Highest Tardiness: "+cTemp.getHighestTardiness());
+//                                    int u =0 ;
+//                                    for (Shift shift : cTemp.getCaregiversRouteUp()) {
+//                                        System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
+//                                        u++;
+//                                    }
+//                                    System.exit(1);
+//                                }
                             }
                             swapPatients(c1Routes[c1], pIndex, k);
                         }
@@ -675,7 +730,7 @@ public class SwapOperator implements Runnable {
                     for (int k = 0; k < c1Routes[c1].size(); k++) {
                         int otherPatient = c1Routes[c1].get(k);
                         Patient patient2 = allPatients[otherPatient];
-                        if (swapIsPossible(cTemp, otherPatient, patient2, patientRouteIndex, c1)) {
+                        if (swapIsPossible(cTemp, -1, otherPatient, patient2, patientRouteIndex, c1)) {
                             c1Routes[c1].set(k, patient);
                             c1Routes[patientRouteIndex].set(pIndex, otherPatient);
                             //TODO
@@ -689,8 +744,8 @@ public class SwapOperator implements Runnable {
                             double tempCost = calSwapMoveCost(6,c1, k, patientRouteIndex, pIndex, -1, -1, -1, -1, patient, otherPatient, k, -1, -1, cTemp, bestCost, shifts, isInvalid);
 //                            System.out.println("best cost: " + bestCost);
 //                            System.out.println("1 Swap cost: " + tempCost);
-                            EvaluationFunction.EvaluateFitness(cTemp);
-                            double subCost = cTemp.getFitness();
+//                            EvaluationFunction.EvaluateFitness(cTemp);
+//                            double subCost = cTemp.getFitness();
 //                            System.out.println("2 Swap cost: " + subCost);
 //                            System.out.println("Total Distance: "+ cTemp.getTotalTravelCost() + " Total tardiness: "+ cTemp.getTotalTardiness() +
 //                                    " Highest Tardiness: "+ cTemp.getHighestTardiness()+ " Total Waiting: "+ cTemp.getTotalWaitingTime()+
@@ -703,16 +758,21 @@ public class SwapOperator implements Runnable {
                                 bestSecondPosition = pIndex;
                                 bestPatient1 = otherPatient;
 
-                                if(subCost > bestCost) {
-                                    EvaluationFunction.Evaluate(cTemp);
-                                    System.out.println("3 Swap cost: " + cTemp.getFitness());
-                                    int u =0 ;
-                                    for (Shift shift : cTemp.getCaregiversRouteUp()) {
-                                        System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
-                                        u++;
-                                    }
-                                    System.exit(1);
-                                }
+//                                if(Math.abs(subCost - bestCost ) > 0.001 && subCost != Double.POSITIVE_INFINITY) {
+//                                    System.out.println("Sub Cost s12:" + subCost);
+//                                    System.out.println("best Cost s12:" + bestCost);
+//                                    EvaluationFunction.Evaluate(cTemp);
+//                                    System.out.println("3 Swap cost: " + cTemp.getFitness());
+//                                    System.out.println("Travel: "+cTemp.getTotalTravelCost());
+//                                    System.out.println("Tardiness: "+cTemp.getTotalTardiness());
+//                                    System.out.println("Highest Tardiness: "+cTemp.getHighestTardiness());
+//                                    int u =0 ;
+//                                    for (Shift shift : cTemp.getCaregiversRouteUp()) {
+//                                        System.out.println("Shift Travel Cost "+u+ " "+shift.getTravelCost());
+//                                        u++;
+//                                    }
+//                                    System.exit(1);
+//                                }
                             }
 
                             c1Routes[c1].set(k, otherPatient);
@@ -730,7 +790,7 @@ public class SwapOperator implements Runnable {
                     swapPatients(c1Routes[bestFirst], pIndex, bestFirstPosition);
                 }
 //                System.out.println("SOut1: "+bestCost);
-//                EvaluationFunction.EvaluateFitness(cTemp);
+                EvaluationFunction.EvaluateFitness(cTemp);
 //                System.out.println("Out2: "+cTemp.getFitness());
 //                EvaluationFunction.Evaluate(cTemp);
 //                System.out.println("Out3: "+cTemp.getFitness());
@@ -747,9 +807,12 @@ public class SwapOperator implements Runnable {
         route.set(p2Index, p1);
     }
 
-    private boolean swapIsPossible(Solution cTemp, int patientIndex, Patient patient, int routeIndex, int otherPatientRouteIndex1) {
-        if (patient.getRequired_caregivers().length > 1) {
-            Set<Integer> routeIndexesOfOtherPatient = cTemp.getPatientRoutes(patientIndex);
+    private boolean swapIsPossible(Solution cTemp, int otherRouteIndex, int patient1Index, Patient patient1, int routeIndex, int otherPatientRouteIndex1) {
+        if(otherRouteIndex == otherPatientRouteIndex1) {
+            return false;
+        }
+        if (patient1.getRequired_caregivers().length > 1) {
+            Set<Integer> routeIndexesOfOtherPatient = cTemp.getPatientRoutes(patient1Index);
             int otherPatientRouteIndex2 = -1;
             for (int r : routeIndexesOfOtherPatient) {
                 if (r != otherPatientRouteIndex1) {
@@ -760,13 +823,13 @@ public class SwapOperator implements Runnable {
             if (otherPatientRouteIndex2 == -1 || routeIndex == otherPatientRouteIndex2) {
                 return false;
             }
-            Set<Integer> possibleFirstRoute = patient.getPossibleFirstCaregiver();
-            Set<Integer> possibleSecondRoute = patient.getPossibleSecondCaregiver();
+            Set<Integer> possibleFirstRoute = patient1.getPossibleFirstCaregiver();
+            Set<Integer> possibleSecondRoute = patient1.getPossibleSecondCaregiver();
             return possibleFirstRoute.contains(otherPatientRouteIndex2) && possibleSecondRoute.contains(routeIndex)
                     || possibleFirstRoute.contains(routeIndex) && possibleSecondRoute.contains(otherPatientRouteIndex2);
 
         } else {
-            return patient.getPossibleFirstCaregiver().contains(routeIndex);
+            return patient1.getPossibleFirstCaregiver().contains(routeIndex);
         }
     }
 
@@ -812,7 +875,6 @@ public class SwapOperator implements Runnable {
                                    int y, int patient, int patient1, int patient1Position, int patient2,
                                    int patient2Position, Solution cTemp, double bestCost,
                                    Shift[] shifts, boolean isInvalid) {
-        Arrays.fill(routeEndPoint, -1);
         if (isInvalid) {
             EvaluationFunction.EvaluateFitness(cTemp);
 //            System.out.println("Invalid solution");
@@ -821,6 +883,7 @@ public class SwapOperator implements Runnable {
 //                    " Total overtime: "+ cTemp.getOvertime()+ " Highest Idle time: "+ cTemp.getHighestIdleTime());
             return cTemp.getFitness();
         }
+        Arrays.fill(routeEndPoint, -1);
 
         int size;
         int[] routeMove;
@@ -861,8 +924,12 @@ public class SwapOperator implements Runnable {
         else  if(pos == 4){
             size = 3;
             routeEndPoint[first] = m;
-            routeEndPoint[third] = x;
-            routeEndPoint[fourth] = y;
+//            routeEndPoint[third] = x;
+//            routeEndPoint[fourth] = y;
+            routeEndPoint[third] = routeEndPoint[third] > -1 && routeEndPoint[third] < x? routeEndPoint[third] : x;
+            routeEndPoint[fourth] = routeEndPoint[fourth] > -1 && routeEndPoint[fourth]< y? routeEndPoint[fourth]: y;
+
+
 
             routeMove = new int[size];
             positionMove = new int[size];
@@ -900,8 +967,10 @@ public class SwapOperator implements Runnable {
         } else if(pos == 7){
             size = 3;
             routeEndPoint[first] = m;
-            routeEndPoint[second] = n;
-            routeEndPoint[third] = x;
+//            routeEndPoint[second] = n;
+//            routeEndPoint[third] = x;
+            routeEndPoint[second] = routeEndPoint[second] > -1 && routeEndPoint[second] < n? routeEndPoint[second] : n;
+            routeEndPoint[third] = routeEndPoint[third] > -1 && routeEndPoint[third] < x? routeEndPoint[third] : x;
 
             routeMove = new int[size];
             positionMove = new int[size];
@@ -912,11 +981,26 @@ public class SwapOperator implements Runnable {
             routeMove[2] = third;
             positionMove[2] = x;
         }else {
+//            System.out.println("Patient: "+patient);
+//            System.out.println("Patient position: "+n+" "+y);
+//            System.out.println("Patient1: "+patient1);
+//            System.out.println("Patient1 position: "+patient1Position);
+//            System.out.println("Patient2: "+patient2);
+//            System.out.println("Patient2 position: "+patient2Position);
+//            System.out.println("route1: "+ first +" m: "+m);
+//            System.out.println("route2: "+ second+ " n: "+n);
+//            System.out.println("route3: "+ third+ " x: "+x);
+//            System.out.println("route4: "+ fourth+" y: "+ y);
             size = 4;
             routeEndPoint[first] = m;
-            routeEndPoint[second] = n;
-            routeEndPoint[third] = x;
-            routeEndPoint[fourth] = y;
+            routeEndPoint[second] = routeEndPoint[second] > -1 && routeEndPoint[second] < n? routeEndPoint[second] : n;
+            routeEndPoint[third] = routeEndPoint[third] > -1 && routeEndPoint[third] < x? routeEndPoint[third] : x;
+            routeEndPoint[fourth] = routeEndPoint[fourth] > -1 && routeEndPoint[fourth]< y? routeEndPoint[fourth]: y;
+
+//            for (int i =0; i< routeEndPoint.length; i++){
+//                System.out.print("route: "+i+" "+routeEndPoint[i] + " | ");
+//            }
+//            System.out.println();
 
             routeMove = new int[size];
             positionMove = new int[size];
@@ -933,13 +1017,17 @@ public class SwapOperator implements Runnable {
 
         removeAffectedPatientSwap(routeMove, positionMove, cTemp, p1, routeEndPoint);
 
+//        if(pos == 8) {
+//            System.out.println("after removal");
+//            for (int i = 0; i < routeEndPoint.length; i++) {
+//                System.out.print("route: " + i + " " + routeEndPoint[i] + " | ");
+//            }
+//            System.out.println();
+//        }
 
         double totalTravelCost = 0.0;
         double highestIdleTime = 0.0;
         Arrays.fill(highestAndTotalTardiness, 0);
-        Arrays.fill(totalWaitingTime, 0);
-        Arrays.fill(startingWaitingTime, 0);
-        double overallOvertime = 0.0;
         double[] testDistance = new double[numOfCaregivers];
         for (int i = 0; i < routeEndPoint.length; i++) {
             Shift shift = shifts[i];
@@ -947,31 +1035,24 @@ public class SwapOperator implements Runnable {
             List<Double> travelCost = shift.getTravelCost();
             List<Double> tardiness = shift.getTardiness();
             List<Double> maxTardiness = shift.getMaxTardiness();
-            List<Double> waitingTime = shift.getTotalWaitingTime();
-            List<Double> overtime = shift.getOvertime();
 
-
-            if(routeEndPoint[i] != 0){
-                startingWaitingTime[i] = shift.getStartingWaitingTime();
-            }
             if (routeEndPoint[i] != -1) {
                 int index = routeEndPoint[i];
                 totalTravelCost += travelCost.get(index);
+                testDistance[i] = travelCost.get(index);
                 routesCurrentTime[i] = currentTime.get(index);
                 highestAndTotalTardiness[0] = Math.max(maxTardiness.get(index), highestAndTotalTardiness[0]);
                 highestAndTotalTardiness[1] += tardiness.get(index);
-                totalWaitingTime[i] = waitingTime.get(index);
+//                System.out.println("o Shift Distance: "+ i + " " + travelCost);
+//                System.out.println("t Shift Distance: "+ i + " " + testDistance[i]);
             } else {
                 highestAndTotalTardiness[0] = Math.max(maxTardiness.get(maxTardiness.size() - 1), highestAndTotalTardiness[0]);
                 highestAndTotalTardiness[1] += tardiness.get(tardiness.size() - 1);
-                totalWaitingTime[i] = waitingTime.get(tardiness.size() - 1);
-                totalOvertime[i] = overtime.get(overtime.size() - 1);
-                overallOvertime += overtime.get(overtime.size() - 1);
                 highestIdleTime = Math.max(shift.getIdleTime(), highestIdleTime);
                 totalTravelCost += travelCost.get(travelCost.size() - 1);
 //                System.out.println("a Shift: "+ i + " " + shift.getIdleTime() + " " + highestIdleTime);
+//                System.out.println("a Shift Distance: "+ i + " " + travelCost.get(travelCost.size() - 1));
             }
-            totalWaitingTime[numOfCaregivers] += totalWaitingTime[i];
 //            if (i == first || i == second) {
 //                int index = routeEndPoint[i];
 //                totalTravelCost += travelCost.get(index);
@@ -989,30 +1070,36 @@ public class SwapOperator implements Runnable {
         for (int i = 0; i < routeEndPoint.length; i++) {
             List<Integer> route = genes[i];
             int routeEnd = routeEndPoint[i];
-            int routeStartPoint = allCaregivers[i].getDistance_matrix_index();
+            int routeStartPoint = 0;
             if (routeEnd != -1) {
                 for (int j = routeEnd; j <= route.size(); j++) {
                     if (j == 0) {
                         int nextIndex = route.get(j) + numOfDepartingPoints;
                         totalTravelCost += distances[routeStartPoint][nextIndex];
-                        testDistance[i] = distances[routeStartPoint][nextIndex];
+                        testDistance[i] += distances[routeStartPoint][nextIndex];
                     } else if (j == route.size()) {
                         int prevIndex = route.get(j - 1) + numOfDepartingPoints;
                         totalTravelCost += distances[prevIndex][routeStartPoint];
-                        testDistance[i] = distances[prevIndex][routeStartPoint];
+                        testDistance[i] += distances[prevIndex][routeStartPoint];
                     } else {
                         int nextIndex = route.get(j) + numOfDepartingPoints;
                         int prevIndex = route.get(j - 1) + numOfDepartingPoints;
                         totalTravelCost += distances[prevIndex][nextIndex];
-                        testDistance[i] = distances[prevIndex][nextIndex];
+                        testDistance[i] += distances[prevIndex][nextIndex];
                     }
                 }
 //                System.out.println("c Shift Distance: " + i + " " + testDistance[i]);
             }
         }
 
-        double solutionCost = totalTravelCost + highestAndTotalTardiness[0] + highestAndTotalTardiness[1] + totalWaitingTime[numOfCaregivers] + overallOvertime + highestIdleTime;
+        double solutionCost = 1/ 3d * totalTravelCost + 1/3d * highestAndTotalTardiness[0] + 1/3d *highestAndTotalTardiness[1];
         if (solutionCost > bestCost) {
+//            if(pos==8){
+//                System.out.println("1Travel: "+totalTravelCost);
+//                System.out.println("Tardiness: "+highestAndTotalTardiness[1]);
+//                System.out.println("Highest Tardiness: "+highestAndTotalTardiness[0]);
+//
+//            }
             return solutionCost;
         }
 
@@ -1023,12 +1110,17 @@ public class SwapOperator implements Runnable {
             List<Integer> route = genes[i];
             int routeEnd = routeEndPoint[i];
             if (routeEnd != -1) {
-                int routeStartingPoint = allCaregivers[i].getDistance_matrix_index();
+                int routeStartingPoint = 0;
                 for (int j = routeEnd; j < route.size(); j++) {
                     int current = j == 0 ? routeStartingPoint : route.get(j - 1) + numOfDepartingPoints;
-                    solutionCost = patientIsAssigned(genes, i, current, route.get(j), totalTravelCost, routesCurrentTime, highestAndTotalTardiness, totalWaitingTime, startingWaitingTime, totalOvertime, routeEndPoint, track);
+                    solutionCost = patientIsAssigned(genes, i, current, route.get(j), totalTravelCost, routesCurrentTime, highestAndTotalTardiness, routeEndPoint, track);
                     if (solutionCost == Double.POSITIVE_INFINITY || solutionCost > bestCost) {
-
+//                        if(pos==8){
+//                            System.out.println("2Travel: "+totalTravelCost);
+//                            System.out.println("Tardiness: "+highestAndTotalTardiness[1]);
+//                            System.out.println("Highest Tardiness: "+highestAndTotalTardiness[0]);
+//
+//                        }
                         return solutionCost;
                     }
                     track.clear();
@@ -1040,22 +1132,23 @@ public class SwapOperator implements Runnable {
             List<Integer> route = genes[i];
             int routeEnd = routeEndPoint[i];
             if (routeEnd != -1) {
-                int routeStartingPoint = allCaregivers[i].getDistance_matrix_index();
+                int routeStartingPoint = 0;
                 int lastPatient = route.get(route.size() - 1) + numOfDepartingPoints;
                 double distance = distances[lastPatient][routeStartingPoint];
                 routesCurrentTime[i] += distance;
-                double caregiverClosingTime = allCaregivers[i].getWorking_shift()[1];
-                overallOvertime += Math.max(0, (routesCurrentTime[i] - caregiverClosingTime));
-                double routeIdleTime = totalWaitingTime[i] + Math.max(0, (caregiverClosingTime - routesCurrentTime[i])) + startingWaitingTime[i];
-                highestIdleTime = Math.max(highestIdleTime, routeIdleTime);
-//                System.out.println("c Shift: "+ i + " " + routeIdleTime + " " + highestIdleTime);
             }
         }
 
 //        System.out.println("+Total Distance: "+ totalTravelCost + " Total tardiness: "+ highestAndTotalTardiness[1] +
 //                " Highest Tardiness: "+ highestAndTotalTardiness[0] + " Total Waiting: "+ totalWaitingTime[numOfCaregivers] +
 //                " Total overtime: "+ overallOvertime+ " Highest Idle time: "+ highestIdleTime);
-        return totalTravelCost + highestAndTotalTardiness[0] + highestAndTotalTardiness[1] + totalWaitingTime[numOfCaregivers] + highestIdleTime + overallOvertime;
+//        if(pos==8){
+//            System.out.println("3Travel: "+totalTravelCost);
+//            System.out.println("Tardiness: "+highestAndTotalTardiness[1]);
+//            System.out.println("Highest Tardiness: "+highestAndTotalTardiness[0]);
+//
+//        }
+        return 1/3d * totalTravelCost + 1/3d *highestAndTotalTardiness[0] + 1/3d * highestAndTotalTardiness[1];
     }
 
     public static void removeAffectedPatientSwap(int[] routeMove, int[] positionMove, Solution base, Solution p1, int[] routeEndPoint) {

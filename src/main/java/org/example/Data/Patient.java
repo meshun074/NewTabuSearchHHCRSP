@@ -14,6 +14,7 @@ public class Patient {
     private double[] time_window;
     private Required_Caregiver[] required_caregivers;
     private Synchronization synchronization;
+    private int distance_matrix_index;
     private Set<Integer> possibleFirstCaregiver;
     private Set<Integer> possibleSecondCaregiver;
     private List<Integer> possibleFirstCaregiverList;
@@ -95,6 +96,25 @@ public class Patient {
 
     public Synchronization getSynchronization() {
         return synchronization;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+        // Recalculate cacheId now that id is set
+        // Using a helper method to handle the final field
+        this.distance_matrix_index = calculateCacheId() + 1;
+    }
+
+    private int calculateCacheId() {
+        return Integer.parseInt(id.substring(1)) - 1;
+    }
+
+    public void setDistance_matrix_index(int distance_matrix_index) {
+        this.distance_matrix_index = distance_matrix_index;
+    }
+
+    public int getDistance_matrix_index() {
+        return distance_matrix_index;
     }
 
 }
