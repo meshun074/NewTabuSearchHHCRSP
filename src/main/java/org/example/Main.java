@@ -42,7 +42,7 @@ public class Main {
               int runCount = Integer.parseInt(args[1]);
                     long randomSeed = System.currentTimeMillis() + runCount;
 
-                    Path dataDir = Paths.get("src/main/java/org/example/Data/instance");
+                    Path dataDir = Paths.get("src/main/java/org/example/Data/kummer");
                     if (!Files.isDirectory(dataDir)) {
                         throw new IllegalStateException("Data directory not found: " + dataDir);
                     }
@@ -70,7 +70,7 @@ public class Main {
                     String problemSize = matcher.matches() ? matcher.group(1) : "unknown";
 
                     // Create result directory safely
-                    String resultDirName = "MultiDepotHHCRSP_"
+                    String resultDirName = "SingleDepot"
                             + fileName.substring(0, Math.min(20, fileName.length()))
                             + "_results";
 
